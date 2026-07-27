@@ -21,7 +21,7 @@ jobs:
     # Set default shell to pwsh (PowerShell Core) since we are running on Windows.
     defaults:
       run:
-        shell: pwsh
+        shell: powershell
 
     steps:
       # Step 1: Checkout the repository code onto the self-hosted runner.
