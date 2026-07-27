@@ -1,0 +1,54 @@
+# The name of our workflow as displayed in GitHub Actions UI.
+name: Continuous Deployment
+
+# Defines when this workflow will run.
+# For CD, we run it on push to the main branch (or trigger manually).
+on:
+  push:
+    branches:
+      - 'main'
+  # Allows manually triggering the deployment from the GitHub UI
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs.
+jobs:
+  # The 'deploy' job will deploy the application to our local Minikube cluster.
+  deploy:
+    # IMPORTANT: We use a self-hosted runner because Minikube runs on our local development machine,
+    # which GitHub hosted runners cannot access directly.
+    runs-on: self-hosted
+
+    # Set default shell to pwsh (PowerShell Core) since we are running on Windows.
+    defaults:
+      run:
+        shell: pwsh
+
+    steps:
+      # Step 1: Checkout the repository code onto the self-hosted runner.
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # Step 2: Build the Docker image locally on the host machine.
+      # This builds the image with the tag 'my-app:latest'.
+      - name: Build Docker Image
+        run: |
+          cd app
+          docker build -t my-app:latest .
+
+      # Step 3: Load the built Docker image directly into the Minikube cluster's registry.
+      # This is required so Minikube doesn't try to download it from Docker Hub.
+      - name: Load Image into Minikube
+        run: |
+          minikube image load my-app:latest
+
+      # Step 4: Apply the Kubernetes manifests (ConfigMap, Deployment, Service) to the cluster.
+      # This updates the resources in the Minikube cluster.
+      - name: Deploy Manifests
+        run: |
+          kubectl apply -f k8s/
+
+      # Step 5: Wait for the Deployment rollout to complete successfully.
+      # This ensures the new Pods are up and running before marking the deployment as successful.
+      - name: Wait for Rollout
+        run: |
+          kubectl rollout status deployment/my-app-deployment --timeout=120s

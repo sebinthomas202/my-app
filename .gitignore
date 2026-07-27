@@ -1,0 +1,12 @@
+# Dependency directory
+app/node_modules/
+
+# Log files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+logs/
+
+# Operating system files
+.DS_Store
+Thumbs.db

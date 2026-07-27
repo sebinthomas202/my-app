@@ -1,0 +1,53 @@
+# apiVersion defines the version of the Kubernetes API to use.
+# Deployments are part of the 'apps/v1' API group.
+apiVersion: apps/v1
+
+# kind specifies that we want to create a Deployment.
+# A Deployment manages a set of identical pods (replicas) and handles updating them.
+kind: Deployment
+
+# metadata contains data that uniquely identifies this Deployment (name and labels).
+metadata:
+  name: my-app-deployment
+  labels:
+    app: my-app
+
+# spec defines the desired state of our Deployment.
+spec:
+  # replicas specifies the number of identical Pods that Kubernetes should run.
+  replicas: 2
+
+  # selector tells the Deployment which Pods to manage.
+  # It must match the labels defined in the Pod template below.
+  selector:
+    matchLabels:
+      app: my-app
+
+  # template defines the blueprint/spec for the Pods that Kubernetes will create.
+  template:
+    # metadata for the Pods created by this Deployment template.
+    metadata:
+      labels:
+        app: my-app
+
+    # spec defines the actual containers that will run inside the Pod.
+    spec:
+      containers:
+      - name: my-app
+        # image defines the Docker image to run.
+        # We use 'my-app:latest' which we build and load into Minikube.
+        image: my-app:latest
+
+        # imagePullPolicy: IfNotPresent tells Kubernetes to use the local image if it exists.
+        # This is critical for local Minikube development so it does not attempt to pull from Docker Hub.
+        imagePullPolicy: IfNotPresent
+
+        # ports specifies the port that the container exposes.
+        ports:
+        - containerPort: 3000
+
+        # envFrom injects all key-value pairs from the ConfigMap as environment variables.
+        # This allows index.js to read WELCOME_MESSAGE and PORT.
+        envFrom:
+        - configMapRef:
+            name: my-app-config

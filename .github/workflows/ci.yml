@@ -1,0 +1,44 @@
+# The name of our workflow as displayed in GitHub Actions UI.
+name: Continuous Integration
+
+# Defines when this workflow will run.
+# Here, it runs on every 'push' to any branch.
+on:
+  push:
+    branches:
+      - '**'
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel.
+jobs:
+  # The 'build' job runs our testing and Docker build checks.
+  build:
+    # Specifies the runner environment. ubuntu-latest is the standard hosted runner.
+    runs-on: ubuntu-latest
+
+    # The list of steps that will be executed as part of this job.
+    steps:
+      # Step 1: Checkout the repository code onto the runner.
+      # This uses the official checkout action.
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # Step 2: Install Node.js on the runner environment.
+      # This sets up our runtime so we can install Node dependencies.
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20' # Using Node 20 LTS version
+
+      # Step 3: Install all dependencies defined in package.json.
+      # This mimics running `npm install` locally.
+      - name: Install Dependencies
+        run: |
+          cd app
+          npm install
+
+      # Step 4: Build the Docker image to ensure there are no compilation or setup issues.
+      # Since CI runs on GitHub hosted runner, we just verify the build succeeds.
+      - name: Build Docker Image
+        run: |
+          cd app
+          docker build -t my-app:latest .

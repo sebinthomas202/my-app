@@ -1,0 +1,31 @@
+# apiVersion specifies the Kubernetes API version we are using.
+apiVersion: v1
+
+# kind specifies that we want to create a Service.
+# A Service is an abstract way to expose an application running on a set of Pods as a network service.
+kind: Service
+
+# metadata contains data that uniquely identifies this Service (name and labels).
+metadata:
+  name: my-app-service
+  labels:
+    app: my-app
+
+# spec defines the desired state of our Service.
+spec:
+  # type specifies how the Service is exposed.
+  # NodePort exposes the Service on each Node's IP at a static port.
+  # This makes it easy to access the service from our host machine when using Minikube.
+  type: NodePort
+
+  # ports defines the port mapping.
+  ports:
+  - port: 3000        # The port that the Service itself exposes inside the cluster.
+    targetPort: 3000  # The port on the Pod/container that the Service routes traffic to.
+    nodePort: 30080   # A static port on the Node (must be in range 30000-32767) to access the app externally.
+    protocol: TCP     # The network protocol used (TCP is default).
+
+  # selector tells the Service which Pods to route traffic to.
+  # This must match the labels defined in the Deployment's Pod template.
+  selector:
+    app: my-app

@@ -1,0 +1,19 @@
+# apiVersion specifies the Kubernetes API version we are using to create this object.
+apiVersion: v1
+
+# kind tells Kubernetes what type of resource we want to create.
+# A ConfigMap is used to store non-sensitive configuration data as key-value pairs.
+kind: ConfigMap
+
+# metadata contains information that uniquely identifies the ConfigMap, including its name and labels.
+metadata:
+  name: my-app-config
+  labels:
+    app: my-app
+
+# data contains the configuration key-value pairs that our application will read.
+data:
+  # WELCOME_MESSAGE will be injected as an environment variable in our container.
+  WELCOME_MESSAGE: "Hello from Kubernetes ConfigMap!"
+  # PORT specifies the port that the application inside the container should run on.
+  PORT: "3000"
